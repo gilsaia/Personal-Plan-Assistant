@@ -19,11 +19,11 @@ interface siderState {
 export class PpaSider extends React.Component<siderProps, siderState> {
   state = {
     collapsed: false,
-    logo:logo
+    logo:logo_word
   }
 
   onCollapse = (collapsed: boolean) => {
-    this.setState({ collapsed: collapsed,logo:collapsed?logo_word:logo })
+    this.setState({ collapsed: collapsed })
   }
   render() {
     const { collapsed } = this.state
