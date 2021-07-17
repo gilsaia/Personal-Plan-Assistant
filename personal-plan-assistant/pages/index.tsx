@@ -14,7 +14,7 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <Link href={'/test'}><a>ppa</a></Link>
+          Welcome to <Link href={'/task'}><a>ppa</a></Link>
         </h1>
 
         <p className={styles.description}>
