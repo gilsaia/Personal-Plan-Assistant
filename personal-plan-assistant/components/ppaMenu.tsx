@@ -1,6 +1,6 @@
 import React from 'react'
 import { Menu } from 'antd'
-import { AppstoreOutlined, ProjectOutlined, SettingOutlined } from '@ant-design/icons'
+import { AppstoreOutlined, ClockCircleOutlined, ProjectOutlined, SettingOutlined } from '@ant-design/icons'
 
 interface MenuProps {
   defaultSelectedKey: string
@@ -18,6 +18,9 @@ export class PpaMenu extends React.Component<MenuProps, {}> {
       >
         <Menu.Item key={'tasks'} icon={<AppstoreOutlined />}>
           任务
+        </Menu.Item>
+        <Menu.Item key={'tomato'} icon={<ClockCircleOutlined />}>
+          番茄钟
         </Menu.Item>
         <Menu.Item key={'stats'} icon={<ProjectOutlined />}>
           统计

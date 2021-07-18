@@ -2,7 +2,6 @@ import React from 'react'
 import { Layout } from 'antd'
 import { PpaMenu } from './ppaMenu'
 import Image from 'next/image'
-import logo from '../public/HatchfulExport-All/logo_transparent_cut.png'
 import logo_word from '../public/HatchfulExport-All/logo_transparent_word.png'
 
 const { Sider } = Layout
