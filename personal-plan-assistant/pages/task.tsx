@@ -20,9 +20,7 @@ export default function Task() {
               split={true}
               dataSource={mockData}
               renderItem={item => (
-                <List.Item>
                   <PpaListItem />
-                </List.Item>
               )}
             />
           </div>
