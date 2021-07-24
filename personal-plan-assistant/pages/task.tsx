@@ -3,8 +3,19 @@ import { PpaSider } from '../components/ppaSider'
 import { PpaListItem } from '../components/ppaListItem'
 const { Header, Footer, Sider, Content } = Layout
 
+type transactionType = 'remind' | 'mission' | 'task'
+
+export interface PpaTransaction {
+  category: transactionType
+  title:string
+}
+
 export default function Task() {
-  const mockData = ['1', '22,', '33,']
+  const mockData: PpaTransaction[] = [
+    { category: 'remind',title:'Remind' },
+    { category: 'mission',title:'任务量 中文测试' },
+    { category: 'task',title:'task' }
+  ]
   return (
     <Layout>
       <PpaSider defaultSelectedKey={'tasks'} />
@@ -19,9 +30,7 @@ export default function Task() {
               bordered={true}
               split={true}
               dataSource={mockData}
-              renderItem={item => (
-                  <PpaListItem />
-              )}
+              renderItem={item => <PpaListItem transaction={item} />}
             />
           </div>
         </Content>

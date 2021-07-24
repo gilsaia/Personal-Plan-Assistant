@@ -10,7 +10,7 @@ interface IconButtonState {
   hover: boolean
 }
 
-export class PpaIconButton extends React.Component<any, IconButtonState> {
+export class PpaIconButton extends React.Component<IconButtonProps, IconButtonState> {
   constructor(props:IconButtonProps) {
     super(props);
     this.handleMouseOver=this.handleMouseOver.bind(this);
@@ -43,7 +43,7 @@ export class PpaIconButton extends React.Component<any, IconButtonState> {
         onMouseLeave={this.handleMouseLeave}
         style={{color:this.state.hover?'#40a9ff':''}}
       >
-        <CheckCircleOutlined />
+        {this.props.icon}
       </Button>
     )
   }
