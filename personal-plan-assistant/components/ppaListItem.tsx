@@ -1,25 +1,19 @@
 import React from 'react'
-import { Badge, Button, Card, Col, List, Row } from 'antd'
+import { Badge, Button, Card, Col, List, Progress, Row, Space, Typography } from 'antd'
 import {
   CheckCircleOutlined,
   FormOutlined,
   MoreOutlined
 } from '@ant-design/icons'
 import { PpaIconButton } from './ppaIconButton'
-import { PpaTransaction } from '../pages/task'
+import { getPpaTransactionColor, getPpaTransactionShow, PpaTransaction } from '../lib/ppaTransaction'
 
 interface ItemProps {
-  transaction:PpaTransaction
+  transaction: PpaTransaction
 }
 
 interface ItemState {
   hover: boolean
-}
-
-const colorMap={
-  'remind':'red',
-  'mission':'orange',
-  'task':'cyan'
 }
 
 export class PpaListItem extends React.Component<ItemProps, ItemState> {
@@ -36,23 +30,17 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
   }
   render() {
     const completeButton = (
-      <PpaIconButton key={'complete'} icon={<CheckCircleOutlined/>}/>
+      <PpaIconButton key={'complete'} icon={<CheckCircleOutlined />} />
     )
-    const editButton=(
-      <PpaIconButton key={'edit'} icon={<FormOutlined/>}/>
-    )
-    const moreButton=(
-      <PpaIconButton key={'more'} icon={<MoreOutlined/>}/>
-    )
+    const editButton = <PpaIconButton key={'edit'} icon={<FormOutlined />} />
+    const moreButton = <PpaIconButton key={'more'} icon={<MoreOutlined />} />
     return (
-      <List.Item
-        actions={[
-          completeButton,
-          editButton,
-          moreButton
-        ]}
-      >
-        <Badge color={colorMap[this.props.transaction.category]} text={this.props.transaction.title} />
+      <List.Item actions={[completeButton, editButton, moreButton]}>
+        <Space align={'center'}>
+          <Badge color={getPpaTransactionColor(this.props.transaction)} />
+          <Typography.Text> {this.props.transaction.title}</Typography.Text>
+          {getPpaTransactionShow(this.props.transaction)}
+        </Space>
       </List.Item>
     )
   }
