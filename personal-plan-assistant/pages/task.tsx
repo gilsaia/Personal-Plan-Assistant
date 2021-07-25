@@ -28,9 +28,9 @@ export default function Task() {
       title: 'task',
       beginTime: moment(),
       stats: {
-        total: 7,
+        total: 20,
         period: moment.duration('7', 'd'),
-        complete: 3
+        complete: 5
       }
     }
   ]
