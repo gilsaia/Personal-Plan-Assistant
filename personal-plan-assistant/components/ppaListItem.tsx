@@ -6,7 +6,12 @@ import {
   MoreOutlined
 } from '@ant-design/icons'
 import { PpaIconButton } from './ppaIconButton'
-import { getPpaTransactionColor, getPpaTransactionShow, PpaTransaction } from '../lib/ppaTransaction'
+import {
+  getPpaTransactionColor,
+  getPpaTransactionShow,
+  getPpaTransactionTitle,
+  PpaTransaction
+} from '../lib/ppaTransaction'
 
 interface ItemProps {
   transaction: PpaTransaction
@@ -38,7 +43,7 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
       <List.Item actions={[completeButton, editButton, moreButton]}>
         <Space align={'center'}>
           <Badge color={getPpaTransactionColor(this.props.transaction)} />
-          <Typography.Text> {this.props.transaction.title}</Typography.Text>
+          {getPpaTransactionTitle(this.props.transaction)}
           {getPpaTransactionShow(this.props.transaction)}
         </Space>
       </List.Item>

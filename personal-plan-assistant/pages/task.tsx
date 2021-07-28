@@ -1,39 +1,17 @@
 import { Layout, List, PageHeader } from 'antd'
 import { PpaSider } from '../components/ppaSider'
 import { PpaListItem } from '../components/ppaListItem'
-import { PpaTransaction } from '../lib/ppaTransaction'
+import { PpaTransaction, syncData } from '../lib/ppaTransaction'
 import moment from 'moment'
+import useSWR from 'swr'
+import { fetcher } from './_app'
 const { Header, Footer, Sider, Content } = Layout
 
 export default function Task() {
-  const mockData: PpaTransaction[] = [
-    {
-      category: 'remind',
-      title: 'Remind',
-      beginTime: moment(),
-      endTime: moment('2021-07-26 00:00', 'YYYY-MM-DD HH:mm')
-    },
-    {
-      category: 'mission',
-      title: '任务量 中文测试',
-      beginTime: moment(),
-      volume: {
-        total: moment.duration('50', 'h'),
-        period: moment.duration('7', 'd'),
-        complete: moment.duration('25', 'h')
-      }
-    },
-    {
-      category: 'task',
-      title: 'task',
-      beginTime: moment(),
-      stats: {
-        total: 20,
-        period: moment.duration('7', 'd'),
-        complete: 5
-      }
-    }
-  ]
+
+  let{data,error}=useSWR<PpaTransaction[]>('/api/getTasks',fetcher)
+  data=data?.map(item=>syncData(item))
+
   return (
     <Layout>
       <PpaSider defaultSelectedKey={'tasks'} />
@@ -47,7 +25,7 @@ export default function Task() {
               size={'default'}
               bordered={true}
               split={true}
-              dataSource={mockData}
+              dataSource={data}
               renderItem={item => <PpaListItem transaction={item} />}
             />
           </div>
