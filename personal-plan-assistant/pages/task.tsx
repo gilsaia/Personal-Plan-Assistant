@@ -5,12 +5,14 @@ import { PpaTransaction, syncData } from '../lib/ppaTransaction'
 import moment from 'moment'
 import useSWR from 'swr'
 import { fetcher } from './_app'
+import { GetServerSideProps } from 'next'
+import { Session } from 'next-auth'
+import { getSession } from 'next-auth/client'
 const { Header, Footer, Sider, Content } = Layout
 
 export default function Task() {
-
-  let{data,error}=useSWR<PpaTransaction[]>('/api/getTasks',fetcher)
-  data=data?.map(item=>syncData(item))
+  let { data, error } = useSWR<PpaTransaction[]>('/api/getTasks', fetcher)
+  data = data?.map(item => syncData(item))
 
   return (
     <Layout>
@@ -33,4 +35,23 @@ export default function Task() {
       </Layout>
     </Layout>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<{
+  session: Session | null
+}> = async context => {
+  const session = await getSession(context)
+  if(session===null){
+    return {
+      redirect:{
+        destination:'/api/auth/signin',
+        permanent:false
+      }
+    }
+  }
+  return {
+    props:{
+      session:session
+    }
+  }
 }
