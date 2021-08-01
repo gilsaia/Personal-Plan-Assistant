@@ -49,9 +49,8 @@ export default function handler(
     }
   })
   let fileName='mockData.json'
-  let body=JSON.parse(req.body)
-  if(req.method==='POST'&&body.name){
-    fileName=(body.name as string)+'.json'
+  if(req.method==='POST'&&req.body.name){
+    fileName=(req.body.name as string)+'.json'
   }
   let data:PpaTransaction[]=[]
   getData(fileName).then(userData=>{

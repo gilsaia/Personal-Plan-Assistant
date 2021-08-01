@@ -12,7 +12,10 @@ const { Header, Footer, Sider, Content } = Layout
 
 const fetchTask=(url:RequestInfo,name?:string)=>fetch(url,{
     body:JSON.stringify({name:name}),
-    method:'POST'
+    method:'POST',
+    headers: new Headers({
+      'Content-Type':'application/json'
+    })
   }).then((res)=>res.json())
 
 export default function Task() {
