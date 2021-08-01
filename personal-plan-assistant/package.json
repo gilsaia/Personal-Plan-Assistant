@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
+    "ali-oss": "^6.16.0",
     "antd": "^4.16.7",
     "moment": "^2.29.1",
     "next": "11.0.1",

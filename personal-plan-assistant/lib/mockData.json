@@ -1,0 +1,31 @@
+[
+  {
+    "category": "remind",
+    "title": "Remind",
+    "beginTime": "2021-07-31T13:37:03.663Z",
+    "endTime": "2021-07-25T16:00:00.000Z",
+    "complete": false
+  },
+  {
+    "category": "mission",
+    "title": "任务量 中文测试",
+    "beginTime": "2021-07-31T13:37:03.665Z",
+    "volume": {
+      "total": "PT50H",
+      "period": "P7D",
+      "complete": "PT25H"
+    },
+    "complete": false
+  },
+  {
+    "category": "task",
+    "title": "task",
+    "beginTime": "2021-07-31T13:37:03.666Z",
+    "stats": {
+      "total": 20,
+      "period": "P7D",
+      "complete": 5
+    },
+    "complete": true
+  }
+]

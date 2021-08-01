@@ -7,12 +7,20 @@ import useSWR from 'swr'
 import { fetcher } from './_app'
 import { GetServerSideProps } from 'next'
 import { Session } from 'next-auth'
-import { getSession } from 'next-auth/client'
+import { getSession, useSession } from 'next-auth/client'
 const { Header, Footer, Sider, Content } = Layout
 
+const fetchTask=(url:RequestInfo,name?:string)=>fetch(url,{
+    body:JSON.stringify({name:name}),
+    method:'POST'
+  }).then((res)=>res.json())
+
 export default function Task() {
-  let { data, error } = useSWR<PpaTransaction[]>('/api/getTasks', fetcher)
+  const [session,loading]=useSession()
+  const body=JSON.stringify({name:session?.user?.name})
+  let { data, error } = useSWR<PpaTransaction[]>(['/api/getTasks',session?.user?.name], fetchTask)
   data = data?.map(item => syncData(item))
+
 
   return (
     <Layout>

@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PpaTransaction } from '../../lib/ppaTransaction'
+import { PpaTransaction, syncData } from '../../lib/ppaTransaction'
 import moment from 'moment'
+import mock from '../../lib/mockData.json'
+import { getData, uploadMockData } from '../../lib/manageData'
+import { getSession } from 'next-auth/client'
+import { apiAuth } from '../../lib/auth'
 
 const mockData: PpaTransaction[] = [
   {
@@ -38,5 +42,21 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<PpaTransaction[]>
 ) {
-  res.status(200).json(mockData)
+  apiAuth(req).then(check=>{
+    if(!check){
+      res.status(401)
+      res.end()
+    }
+  })
+  let fileName='mockData.json'
+  if(req.method==='POST'&&req.body.name){
+    fileName=(req.body.name as string)+'.json'
+  }
+  let data:PpaTransaction[]=[]
+  getData(fileName).then(userData=>{
+    res.status(200).json(userData)
+  }).catch(error=>{
+    res.status(200).json(mockData)
+  })
+  // res.status(200).json(mockData)
 }
