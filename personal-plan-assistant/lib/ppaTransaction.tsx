@@ -17,6 +17,7 @@ interface PpaTaskStats {
 }
 
 export interface PpaTransaction {
+  key: string
   category: transactionType
   title: string
   beginTime: Moment
@@ -32,20 +33,20 @@ const colorMap = {
   task: 'cyan'
 }
 
-export function syncData(item:PpaTransaction):PpaTransaction {
-  item.beginTime=moment(item.beginTime)
-  if(item.endTime){
-    item.endTime=moment(item.endTime)
+export function syncData(item: PpaTransaction): PpaTransaction {
+  item.beginTime = moment(item.beginTime)
+  if (item.endTime) {
+    item.endTime = moment(item.endTime)
   }
-  if(item.volume){
-    item.volume.complete=moment.duration(item.volume.complete)
-    item.volume.period=moment.duration(item.volume.period)
-    if(item.volume.total){
-      item.volume.total=moment.duration(item.volume.total)
+  if (item.volume) {
+    item.volume.complete = moment.duration(item.volume.complete)
+    item.volume.period = moment.duration(item.volume.period)
+    if (item.volume.total) {
+      item.volume.total = moment.duration(item.volume.total)
     }
   }
-  if(item.stats){
-    item.stats.period=moment.duration(item.stats.period)
+  if (item.stats) {
+    item.stats.period = moment.duration(item.stats.period)
   }
   return item
 }
@@ -54,10 +55,10 @@ export function getPpaTransactionColor(item: PpaTransaction): string {
   return colorMap[item.category]
 }
 
-export function getPpaTransactionTitle(item:PpaTransaction):JSX.Element{
-  if(!item.complete){
+export function getPpaTransactionTitle(item: PpaTransaction): JSX.Element {
+  if (!item.complete) {
     return <Typography.Text>{item.title}</Typography.Text>
-  }else{
+  } else {
     return <Typography.Text delete>{item.title}</Typography.Text>
   }
 }
@@ -78,7 +79,7 @@ function translateDuration(duration: moment.Duration): string {
 
 export function getPpaTransactionShow(item: PpaTransaction): JSX.Element {
   let text = ''
-  if(item.complete){
+  if (item.complete) {
     return <Typography.Text type={'secondary'}>{text}</Typography.Text>
   }
   switch (item.category) {

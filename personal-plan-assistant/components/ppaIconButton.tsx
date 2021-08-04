@@ -4,6 +4,7 @@ import { CheckCircleOutlined } from '@ant-design/icons'
 
 interface IconButtonProps {
   icon:JSX.Element
+  onClick?:React.MouseEventHandler<HTMLElement>
 }
 
 interface IconButtonState {
@@ -41,6 +42,7 @@ export class PpaIconButton extends React.Component<IconButtonProps, IconButtonSt
         size={'small'}
         onMouseOver={this.handleMouseOver}
         onMouseLeave={this.handleMouseLeave}
+        onClick={this.props.onClick}
         style={{color:this.state.hover?'#40a9ff':''}}
       >
         {this.props.icon}

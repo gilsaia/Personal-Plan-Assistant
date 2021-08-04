@@ -19,9 +19,7 @@ const fetchTask=(url:RequestInfo,name?:string)=>fetch(url,{
   }).then((res)=>res.json())
 
 export default function Task() {
-  const [session,loading]=useSession()
-  const body=JSON.stringify({name:session?.user?.name})
-  let { data, error } = useSWR<PpaTransaction[]>(['/api/getTasks',session?.user?.name], fetchTask)
+  let { data, error } = useSWR<PpaTransaction[]>('/api/getTasks', fetcher)
   data = data?.map(item => syncData(item))
 
 

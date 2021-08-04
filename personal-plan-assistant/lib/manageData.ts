@@ -1,5 +1,10 @@
 import mock from './mockData.json'
 import { PpaTransaction, syncData } from './ppaTransaction'
+import { string } from 'prop-types'
+
+interface ossTag{
+  [tagName:string]:string
+}
 
 let OSS = require('ali-oss')
 
@@ -27,12 +32,56 @@ export async function getData(fileName: string): Promise<PpaTransaction[]> {
   return res.map((item: PpaTransaction) => syncData(item))
 }
 
+export async function getUserTasks(
+  userName: string
+): Promise<PpaTransaction[]> {
+  const userFolder = userName + '/'
+  let tasks: PpaTransaction[] = []
+  try {
+    await client.head(userFolder, {})
+    let result=await client.listV2({
+      delimiter:'/',
+      prefix:userFolder,
+    })
+    for(const file of result.objects){
+      if(file.size>0){
+        let task=await client.get(file.name)
+        task=JSON.parse(task.content.toString())
+        tasks.push(task)
+      }
+    }
+  } catch (error) {
+    if (error.code === 'NoSuchKey') {
+      client.put(userFolder, Buffer.from(''))
+      await uploadMockData(userFolder)
+    }
+    tasks = mock as unknown as PpaTransaction[]
+  }
+  return tasks
+}
+
+export async function uploadTask(prefix: string, task: PpaTransaction) {
+  const taskPath = prefix + task.key + '.json'
+  const buffer = Buffer.from(JSON.stringify(task))
+  await client.put(taskPath, buffer)
+}
+
+export async function uploadTaskTag(prefix:string,task:PpaTransaction,tag:ossTag){
+  const taskPath = prefix + task.key + '.json'
+  try{
+    await client.putObjectTagging(taskPath,tag)
+  }catch (e) {
+    console.log(e)
+  }
+}
+
 export async function uploadData(fileName: string, data: PpaTransaction[]) {
   const buffer = Buffer.from(JSON.stringify(data))
   await client.put(fileName, buffer)
 }
 
-export async function uploadMockData(fileName: string) {
-  const data = Buffer.from(JSON.stringify(mock))
-  await client.put(fileName, data)
+export async function uploadMockData(prefix: string) {
+  for (const task of mock) {
+    await uploadTask(prefix, task as unknown as PpaTransaction)
+  }
 }
