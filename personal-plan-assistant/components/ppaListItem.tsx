@@ -53,8 +53,9 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
     this.setState({
       item: item
     })
-    fetchTask('/api/completeTask', item).then(
-    )
+    fetchTask('/api/completeTask', item).catch((error)=>{
+      console.log(error)
+    })
   }
   render() {
     const completeButton = (

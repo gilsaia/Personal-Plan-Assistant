@@ -60,10 +60,44 @@ export async function getUserTasks(
   return tasks
 }
 
+export async function uploadMockData(prefix: string) {
+  for (const task of mock) {
+    await uploadTask(prefix, task as unknown as PpaTransaction)
+  }
+}
+
 export async function uploadTask(prefix: string, task: PpaTransaction) {
   const taskPath = prefix + task.key + '.json'
   const buffer = Buffer.from(JSON.stringify(task))
   await client.put(taskPath, buffer)
+}
+
+export async function completeTaskTag(prefix:string,task:PpaTransaction){
+  let nextKeyMarker=null
+  let nextVersionMarker=null
+  let versionListing=null
+  const taskPath = prefix + task.key + '.json'
+  const tag={
+    complete:'true'
+  }
+  do {
+    versionListing=await client.getBucketVersions({
+      keyMarker:nextKeyMarker,
+      versionIdMarker:nextVersionMarker,
+      prefix:taskPath
+    })
+    for(const task of versionListing.objects){
+      try {
+        await client.putObjectTagging(task.name, tag, {
+          versionId: task.versionId
+        })
+      }catch (e) {
+        console.log(e)
+      }
+    }
+    nextKeyMarker=versionListing.NextKeyMarker
+    nextVersionMarker=versionListing.NextVersionIdMarker
+  }while(versionListing.isTruncated)
 }
 
 export async function uploadTaskTag(prefix:string,task:PpaTransaction,tag:ossTag){
@@ -78,10 +112,4 @@ export async function uploadTaskTag(prefix:string,task:PpaTransaction,tag:ossTag
 export async function uploadData(fileName: string, data: PpaTransaction[]) {
   const buffer = Buffer.from(JSON.stringify(data))
   await client.put(fileName, buffer)
-}
-
-export async function uploadMockData(prefix: string) {
-  for (const task of mock) {
-    await uploadTask(prefix, task as unknown as PpaTransaction)
-  }
 }

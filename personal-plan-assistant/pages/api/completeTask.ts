@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/client'
-import { uploadTask, uploadTaskTag } from '../../lib/manageData'
+import { completeTaskTag, uploadTask, uploadTaskTag } from '../../lib/manageData'
 import { PpaTransaction } from '../../lib/ppaTransaction'
 
 export default async function handler(req:NextApiRequest,res:NextApiResponse){
@@ -13,6 +13,9 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
   const prefix=session.user.name+'/'
   const task:PpaTransaction=req.body.task
   await uploadTask(prefix, task)
-  const tag={complete:task.complete?'true':'false'}
-  await uploadTaskTag(prefix,task,tag)
+  if(task.complete){
+    await completeTaskTag(prefix,task)
+  }
+  res.status(200)
+  res.end()
 }
