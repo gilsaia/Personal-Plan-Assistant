@@ -44,7 +44,7 @@ export default function Task() {
               bordered={true}
               split={true}
               dataSource={data}
-              renderItem={item => <PpaListItem transaction={item} />}
+              renderItem={item => <PpaListItem key={item.key} transaction={item} />}
             />
           </div>
         </Content>

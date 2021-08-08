@@ -38,7 +38,7 @@ const fetchTask=(url:RequestInfo,item:PpaTransaction)=>fetch(url,{
   headers: new Headers({
     'Content-Type':'application/json'
   })
-}).then((res)=>res.json())
+}).then((res)=>{})
 
 export class PpaListItem extends React.Component<ItemProps, ItemState> {
   state = {item:this.props.transaction}

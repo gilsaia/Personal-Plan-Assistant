@@ -1,6 +1,8 @@
 import React, { CSSProperties } from 'react'
 import { Button, FormInstance } from 'antd'
 import { PpaTaskModal } from './ppaTaskModal'
+import { constructRemind, PpaTransaction } from '../lib/ppaTransaction'
+import { mutate } from 'swr'
 
 interface ButtonModalProps {
   buttonText: string
@@ -10,6 +12,14 @@ interface ButtonModalProps {
 interface ButtonModalState {
   visible: boolean
 }
+
+const fetchTask=(url:RequestInfo,item:Object)=>fetch(url,{
+  body:JSON.stringify({task:item}),
+  method:'POST',
+  headers: new Headers({
+    'Content-Type':'application/json'
+  })
+}).then((res)=>{})
 
 export class PpaButtonModal extends React.Component<
   ButtonModalProps,
@@ -29,8 +39,17 @@ export class PpaButtonModal extends React.Component<
     this.setState({ visible: true })
   }
 
-  handleOk() {
-    this.setState({ visible: false })
+  async handleOk() {
+    try{
+      const values=await this.formRef.current!.validateFields()
+      if(values.category==='remind'){
+        const task=constructRemind(values.title,values.date)
+        await fetchTask('/api/addTask',task)
+      }
+      await mutate('/api/getTasks')
+      this.setState({ visible: false })
+    } catch (e){
+    }
   }
 
   handleCancel() {

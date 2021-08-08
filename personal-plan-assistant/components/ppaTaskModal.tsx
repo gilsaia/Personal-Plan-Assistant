@@ -30,6 +30,9 @@ export class PpaTaskModal extends React.Component<
   }
 
   render() {
+    const validateMessages={
+      required:"${label}是必选字段"
+    }
     let remainList = <p>Wrong</p>
     if (this.state.category === 'remind') {
       remainList = (
@@ -57,6 +60,7 @@ export class PpaTaskModal extends React.Component<
         onCancel={this.props.handleCancel}
       >
         <Form
+          validateMessages={validateMessages}
           name={'task'}
           ref={this.props.form}
           layout={'horizontal'}
@@ -66,6 +70,7 @@ export class PpaTaskModal extends React.Component<
           <Form.Item
             name="category"
             label="类别"
+            initialValue={this.state.category}
             // rules={[{ required: true, message: 'Please input the title of collection!' }]}
           >
             <Radio.Group

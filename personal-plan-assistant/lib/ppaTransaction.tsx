@@ -1,6 +1,7 @@
 import moment, { Moment } from 'moment'
 import { Progress, Typography } from 'antd'
 import React from 'react'
+import { v1 } from 'uuid'
 
 type transactionType = 'remind' | 'mission' | 'task'
 
@@ -60,6 +61,17 @@ export function getPpaTransactionTitle(item: PpaTransaction): JSX.Element {
     return <Typography.Text>{item.title}</Typography.Text>
   } else {
     return <Typography.Text delete>{item.title}</Typography.Text>
+  }
+}
+
+export function constructRemind(title:string,endTime?:Moment):PpaTransaction{
+  return {
+    key:v1(),
+    category:'remind',
+    title:title,
+    beginTime:moment(),
+    endTime:endTime,
+    complete:false
   }
 }
 
