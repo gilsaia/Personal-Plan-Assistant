@@ -64,13 +64,13 @@ export function getPpaTransactionTitle(item: PpaTransaction): JSX.Element {
   }
 }
 
-export function constructRemind(title:string,endTime?:Moment):PpaTransaction{
+export function constructRemind(title:string,enableTime:boolean,endTime?:Moment):PpaTransaction{
   return {
     key:v1(),
     category:'remind',
     title:title,
     beginTime:moment(),
-    endTime:endTime,
+    endTime:enableTime?endTime:undefined,
     complete:false
   }
 }

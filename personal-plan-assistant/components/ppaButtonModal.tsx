@@ -43,7 +43,7 @@ export class PpaButtonModal extends React.Component<
     try{
       const values=await this.formRef.current!.validateFields()
       if(values.category==='remind'){
-        const task=constructRemind(values.title,values.date)
+        const task=constructRemind(values.title,values.enableDate,values.date)
         await fetchTask('/api/addTask',task)
       }
       await mutate('/api/getTasks')
