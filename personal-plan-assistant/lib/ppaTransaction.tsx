@@ -7,13 +7,13 @@ type transactionType = 'remind' | 'mission' | 'task'
 
 interface PpaMissionVolume {
   total?: moment.Duration
-  period: moment.Duration
+  period?: moment.Duration
   complete: moment.Duration
 }
 
 interface PpaTaskStats {
   total?: number
-  period: moment.Duration
+  period?: moment.Duration
   complete: number
 }
 
@@ -72,6 +72,36 @@ export function constructRemind(title:string,enableTime:boolean,endTime?:Moment)
     beginTime:moment(),
     endTime:enableTime?endTime:undefined,
     complete:false
+  }
+}
+
+export function constructMission(title:string,beginTime:Moment,unlimited?:boolean,volume?:number,repeat?:boolean,period?:number):PpaTransaction{
+  return {
+    key:v1(),
+    category:'mission',
+    title:title,
+    beginTime:beginTime,
+    complete:false,
+    volume:{
+      total:unlimited?undefined:moment.duration(volume,'hours'),
+      period:repeat?moment.duration(period,'days'):undefined,
+      complete:moment.duration(0)
+    }
+  }
+}
+
+export function constructTask(title:string,beginTime:Moment,unlimited?:boolean,volume?:number,repeat?:boolean,period?:number):PpaTransaction{
+  return {
+    key:v1(),
+    category:'task',
+    title:title,
+    beginTime:beginTime,
+    complete:false,
+    stats:{
+      total:unlimited?undefined:volume,
+      period:repeat?moment.duration(period,'days'):undefined,
+      complete:0
+    }
   }
 }
 
