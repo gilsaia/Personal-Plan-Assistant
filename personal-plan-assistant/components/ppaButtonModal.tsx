@@ -5,7 +5,7 @@ import {
   constructMission,
   constructRemind,
   constructTask,
-  PpaTransaction
+  PpaTransaction, translateTask
 } from '../lib/ppaTransaction'
 import { mutate } from 'swr'
 
@@ -48,34 +48,8 @@ export class PpaButtonModal extends React.Component<
   async handleOk() {
     try {
       const values = await this.formRef.current!.validateFields()
-      if (values.category === 'remind') {
-        const task = constructRemind(
-          values.title,
-          values.enableDate,
-          values.date
-        )
-        await fetchTask('/api/addTask', task)
-      } else if (values.category === 'mission') {
-        const task = constructMission(
-          values.title,
-          values.date,
-          values.unlimited,
-          values.volume,
-          values.repeat,
-          values.period
-        )
-        await fetchTask('/api/addTask', task)
-      } else if (values.category === 'task') {
-        const task = constructTask(
-          values.title,
-          values.date,
-          values.unlimited,
-          values.volume,
-          values.repeat,
-          values.period
-        )
-        await fetchTask('/api/addTask',task)
-      }
+      const task=translateTask(values)
+      await fetchTask('/api/addTask',task)
       await mutate('/api/getTasks')
       this.setState({ visible: false })
     } catch (e) {}

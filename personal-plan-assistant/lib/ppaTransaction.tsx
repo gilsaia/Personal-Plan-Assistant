@@ -41,13 +41,17 @@ export function syncData(item: PpaTransaction): PpaTransaction {
   }
   if (item.volume) {
     item.volume.complete = moment.duration(item.volume.complete)
-    item.volume.period = moment.duration(item.volume.period)
+    if(item.volume.period){
+      item.volume.period=moment.duration(item.volume.period)
+    }
     if (item.volume.total) {
       item.volume.total = moment.duration(item.volume.total)
     }
   }
   if (item.stats) {
-    item.stats.period = moment.duration(item.stats.period)
+    if(item.stats.period){
+      item.stats.period=moment.duration(item.stats.period)
+    }
   }
   return item
 }
@@ -103,6 +107,78 @@ export function constructTask(title:string,beginTime:Moment,unlimited?:boolean,v
       complete:0
     }
   }
+}
+
+export function translateTask(values:any):PpaTransaction{
+  let task={}
+  if (values.category === 'remind') {
+    task = constructRemind(
+      values.title,
+      values.enableDate,
+      values.date
+    )
+  } else if (values.category === 'mission') {
+    task = constructMission(
+      values.title,
+      values.date,
+      values.unlimited,
+      values.volume,
+      values.repeat,
+      values.period
+    )
+  } else if (values.category === 'task') {
+    task = constructTask(
+      values.title,
+      values.date,
+      values.unlimited,
+      values.volume,
+      values.repeat,
+      values.period
+    )
+  }
+  return task as PpaTransaction
+}
+
+export function antiTranslateTask(task:PpaTransaction):any{
+  let values=Object()
+  if(task.category==='remind'){
+    values.category='remind'
+    values.title=task.title
+    values.enableDate=false
+    if(task.endTime){
+      values.enableDate=true
+      values.date=task.endTime
+    }
+  }else if(task.category==='mission'){
+    values.category='mission'
+    values.title=task.title
+    values.date=task.beginTime
+    values.unlimited=true
+    if(task.volume?.total){
+      values.unlimited=false
+      values.volume=task.volume.total.asHours()
+    }
+    values.repeat=false
+    if(task.volume?.period){
+      values.repeat=true
+      values.period=task.volume.period.asDays()
+    }
+  }else if(task.category==='task'){
+    values.category='task'
+    values.title=task.title
+    values.date=task.beginTime
+    values.unlimited=true
+    if(task.stats?.total){
+      values.unlimited=false
+      values.volume=task.stats.total
+    }
+    values.repeat=false
+    if(task.stats?.period){
+      values.repeat=true
+      values.period=task.stats.period.asDays()
+    }
+  }
+  return values
 }
 
 function translateDuration(duration: moment.Duration): string {

@@ -13,8 +13,8 @@ import {
   Space,
   Typography
 } from 'antd'
-import moment from 'moment'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { antiTranslateTask, PpaTransaction } from '../lib/ppaTransaction'
 
 interface TaskModalProps {
   title: string
@@ -22,6 +22,7 @@ interface TaskModalProps {
   form: React.RefObject<FormInstance>
   handleOk: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
   handleCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
+  task?: PpaTransaction
 }
 
 interface TaskModalState {
@@ -35,12 +36,12 @@ export class PpaTaskModal extends React.Component<
   TaskModalProps,
   TaskModalState
 > {
-  state = {
-    category: 'remind',
-    enableDate: false,
-    enableMissionPeriod: true,
-    enableMissionUnlimited: false
-  }
+  // state = {
+  //   category: 'remind',
+  //   enableDate: false,
+  //   enableMissionPeriod: true,
+  //   enableMissionUnlimited: false
+  // }
 
   constructor(props: TaskModalProps) {
     super(props)
@@ -49,6 +50,23 @@ export class PpaTaskModal extends React.Component<
     this.onEnableMissionPeriodChange =
       this.onEnableMissionPeriodChange.bind(this)
     this.onEnableMissionLimitChange = this.onEnableMissionLimitChange.bind(this)
+    this.setFieldValue=this.setFieldValue.bind(this)
+    if(this.props.task){
+      const values=antiTranslateTask(this.props.task)
+      this.state={
+        category:values.category,
+        enableDate:values.enableDate,
+        enableMissionPeriod:values.repeat,
+        enableMissionUnlimited:values.unlimited
+      }
+    }else{
+      this.state={
+        category:'remind',
+        enableDate:false,
+        enableMissionPeriod:true,
+        enableMissionUnlimited:false
+      }
+    }
   }
 
   onCategoryChange(e: RadioChangeEvent) {
@@ -67,7 +85,15 @@ export class PpaTaskModal extends React.Component<
     this.setState({ enableMissionUnlimited: e.target.checked })
   }
 
+  setFieldValue(): any {
+    if (this.props.task) {
+      return antiTranslateTask(this.props.task)
+    }
+    return null
+  }
+
   render() {
+    const values = this.setFieldValue()
     const validateMessages = {
       required: '${label}是必选字段'
     }
@@ -88,10 +114,7 @@ export class PpaTaskModal extends React.Component<
             initialValue={this.state.enableDate}
             valuePropName={'checked'}
           >
-            <Checkbox
-              onChange={this.onEnableDateChange}
-              defaultChecked={this.state.enableDate}
-            />
+            <Checkbox onChange={this.onEnableDateChange} />
           </Form.Item>
           <Form.Item name={'date'} label={'截止时间'}>
             <DatePicker showTime disabled={!this.state.enableDate} />
@@ -137,10 +160,7 @@ export class PpaTaskModal extends React.Component<
                 noStyle
                 initialValue={this.state.enableMissionUnlimited}
               >
-                <Checkbox
-                  onChange={this.onEnableMissionLimitChange}
-                  defaultChecked={this.state.enableMissionUnlimited}
-                >
+                <Checkbox onChange={this.onEnableMissionLimitChange}>
                   无上限
                 </Checkbox>
               </Form.Item>
@@ -152,10 +172,7 @@ export class PpaTaskModal extends React.Component<
             initialValue={this.state.enableMissionPeriod}
             valuePropName={'checked'}
           >
-            <Checkbox
-              onChange={this.onEnableMissionPeriodChange}
-              defaultChecked={this.state.enableMissionPeriod}
-            />
+            <Checkbox onChange={this.onEnableMissionPeriodChange} />
           </Form.Item>
           <Form.Item name={'period'} label={'周期'} initialValue={1}>
             <Slider
@@ -216,10 +233,7 @@ export class PpaTaskModal extends React.Component<
                 noStyle
                 initialValue={this.state.enableMissionUnlimited}
               >
-                <Checkbox
-                  onChange={this.onEnableMissionLimitChange}
-                  defaultChecked={this.state.enableMissionUnlimited}
-                >
+                <Checkbox onChange={this.onEnableMissionLimitChange}>
                   无上限
                 </Checkbox>
               </Form.Item>
@@ -231,10 +245,7 @@ export class PpaTaskModal extends React.Component<
             initialValue={this.state.enableMissionPeriod}
             valuePropName={'checked'}
           >
-            <Checkbox
-              onChange={this.onEnableMissionPeriodChange}
-              defaultChecked={this.state.enableMissionPeriod}
-            />
+            <Checkbox onChange={this.onEnableMissionPeriodChange} />
           </Form.Item>
           <Form.Item name={'period'} label={'周期'} initialValue={1}>
             <Slider
@@ -272,6 +283,7 @@ export class PpaTaskModal extends React.Component<
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 16 }}
           requiredMark={false}
+          initialValues={values}
         >
           <Form.Item
             name="category"
@@ -279,7 +291,7 @@ export class PpaTaskModal extends React.Component<
             initialValue={this.state.category}
           >
             <Radio.Group
-              defaultValue="remind"
+              // defaultValue="remind"
               buttonStyle="solid"
               onChange={this.onCategoryChange}
             >
