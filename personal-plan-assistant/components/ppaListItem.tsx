@@ -5,7 +5,9 @@ import {
   Card,
   Col,
   FormInstance,
+  InputNumber,
   List,
+  Popover,
   Progress,
   Row,
   Space,
@@ -35,6 +37,8 @@ interface ItemProps {
 interface ItemState {
   item: PpaTransaction
   modalVisible: boolean
+  missionCompleteValue: number
+  taskCompleteValue: number
 }
 
 const fetchTask = (url: RequestInfo, item: PpaTransaction) =>
@@ -47,13 +51,20 @@ const fetchTask = (url: RequestInfo, item: PpaTransaction) =>
   }).then(res => {})
 
 export class PpaListItem extends React.Component<ItemProps, ItemState> {
-  state = { item: this.props.transaction, modalVisible: false }
+  state = {
+    item: this.props.transaction,
+    modalVisible: false,
+    missionCompleteValue: 0,
+    taskCompleteValue: 0
+  }
   formRef = React.createRef<FormInstance>()
 
   constructor(props: ItemProps) {
     super(props)
     this.onTaskComplete = this.onTaskComplete.bind(this)
     this.onTaskEdit = this.onTaskEdit.bind(this)
+    this.onMissionCompleteValue = this.onMissionCompleteValue.bind(this)
+    this.onTaskCompleteValue=this.onTaskCompleteValue.bind(this)
     this.handleOk = this.handleOk.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
   }
@@ -72,14 +83,24 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
     this.setState({ modalVisible: true })
   }
 
+  onMissionCompleteValue(value: number) {
+    value = Math.floor(value)
+    this.setState({ missionCompleteValue: value })
+  }
+
+  onTaskCompleteValue(value: number) {
+    value = Math.floor(value)
+    this.setState({ taskCompleteValue: value })
+  }
+
   async handleOk() {
     try {
       const values = await this.formRef.current!.validateFields()
-      let task=translateTask(values)
-      task.key=this.state.item.key
-      await fetchTask('/api/addTask',task)
-      await mutate('/api/getTasks')
-      this.setState({ modalVisible: false })
+      let task = translateTask(values)
+      task.key = this.state.item.key
+      task.complete = this.state.item.complete
+      await fetchTask('/api/addTask', task)
+      this.setState({ modalVisible: false, item: task })
     } catch (e) {}
   }
 
@@ -88,13 +109,58 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
   }
 
   render() {
-    const completeButton = (
-      <PpaIconButton
-        key={'complete'}
-        icon={<CheckCircleOutlined />}
-        onClick={this.onTaskComplete}
-      />
-    )
+    let completeButton
+    if (this.state.item.complete || this.state.item.category === 'remind') {
+      completeButton = (
+        <PpaIconButton
+          key={'complete'}
+          icon={<CheckCircleOutlined />}
+          onClick={this.onTaskComplete}
+        />
+      )
+    } else if (this.state.item.category === 'mission') {
+      let popContent = (
+        <>
+          <Space>
+            <Typography.Text>完成</Typography.Text>
+            <InputNumber
+              min={1}
+              max={240}
+              defaultValue={30}
+              onChange={this.onMissionCompleteValue}
+            />
+            <Typography.Text>分钟</Typography.Text>
+            <Button type={'primary'}>提交</Button>
+          </Space>
+        </>
+      )
+      completeButton = (
+        <Popover content={popContent} title={'完成任务'} trigger={'click'}>
+          <PpaIconButton key={'complete'} icon={<CheckCircleOutlined />} />
+        </Popover>
+      )
+    } else if (this.state.item.category === 'task') {
+      let popContent = (
+        <>
+          <Space>
+            <Typography.Text>完成</Typography.Text>
+            <InputNumber
+              min={1}
+              max={64}
+              defaultValue={1}
+              onChange={this.onTaskCompleteValue}
+            />
+            <Typography.Text>次</Typography.Text>
+            <Button type={'primary'}>提交</Button>
+          </Space>
+        </>
+      )
+      completeButton = (
+        <Popover content={popContent} title={'完成任务'} trigger={'click'}>
+          <PpaIconButton key={'complete'} icon={<CheckCircleOutlined />} />
+        </Popover>
+      )
+    }
     const editButton = (
       <PpaIconButton
         key={'edit'}
