@@ -109,6 +109,50 @@ export function constructTask(title:string,beginTime:Moment,unlimited?:boolean,v
   }
 }
 
+export function completeMission(item:PpaTransaction,value:number):PpaTransaction{
+  if(item.volume){
+    item.volume.complete.add(value,'m')
+    if(item.volume.total&&(item.volume.complete.asMinutes()>=item.volume.total.asMinutes())){
+      item.complete=true
+    }
+  }
+  return item
+}
+
+export function completeTask(item:PpaTransaction,value:number):PpaTransaction{
+  if(item.stats){
+    item.stats.complete+=value
+    if(item.stats.total&&item.stats.complete>=item.stats.total){
+      item.complete=true
+    }
+  }
+  return item
+}
+
+export function renewMission(item:PpaTransaction):PpaTransaction|null{
+  let mission=item
+  if(mission.complete&&mission.volume&&mission.volume.period){
+    mission.key=v1()
+    mission.complete=false
+    mission.volume.complete=moment.duration(0)
+    mission.beginTime=moment.max(mission.beginTime.add(mission.volume.period),moment(0,'HH'))
+    return mission
+  }
+  return null
+}
+
+export function renewTask(item:PpaTransaction):PpaTransaction|null{
+  let task=item
+  if(task.complete&&task.stats&&task.stats.period){
+    task.key=v1()
+    task.complete=false
+    task.stats.complete=0
+    task.beginTime=moment.max(task.beginTime.add(task.stats.period),moment(0,'HH'))
+    return task
+  }
+  return null
+}
+
 export function translateTask(values:any):PpaTransaction{
   let task={}
   if (values.category === 'remind') {
@@ -187,7 +231,7 @@ function translateDuration(duration: moment.Duration): string {
     res += Math.floor(duration.asDays()) + '天'
   }
   if (duration.asHours()) {
-    res += (duration.asHours() % 24) + '小时'
+    res += Math.floor(duration.asHours() % 24) + '小时'
   }
   if (duration.asMinutes() || res === '') {
     res += (duration.asMinutes() % 60) + '分'

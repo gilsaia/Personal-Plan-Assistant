@@ -21,10 +21,14 @@ import {
 import { PpaIconButton } from './ppaIconButton'
 import {
   antiTranslateTask,
+  completeMission,
+  completeTask,
   getPpaTransactionColor,
   getPpaTransactionShow,
   getPpaTransactionTitle,
   PpaTransaction,
+  renewMission,
+  renewTask,
   translateTask
 } from '../lib/ppaTransaction'
 import { mutate } from 'swr'
@@ -37,6 +41,7 @@ interface ItemProps {
 interface ItemState {
   item: PpaTransaction
   modalVisible: boolean
+  popVisible: boolean
   missionCompleteValue: number
   taskCompleteValue: number
 }
@@ -54,20 +59,24 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
   state = {
     item: this.props.transaction,
     modalVisible: false,
-    missionCompleteValue: 0,
-    taskCompleteValue: 0
+    popVisible: false,
+    missionCompleteValue: 30,
+    taskCompleteValue: 1
   }
   formRef = React.createRef<FormInstance>()
 
   constructor(props: ItemProps) {
     super(props)
     this.onTaskComplete = this.onTaskComplete.bind(this)
+    this.onMissionComplete = this.onMissionComplete.bind(this)
     this.onTaskEdit = this.onTaskEdit.bind(this)
     this.onMissionCompleteValue = this.onMissionCompleteValue.bind(this)
-    this.onTaskCompleteValue=this.onTaskCompleteValue.bind(this)
+    this.onTaskCompleteValue = this.onTaskCompleteValue.bind(this)
     this.handleOk = this.handleOk.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
+    this.handlePopVisible = this.handlePopVisible.bind(this)
   }
+
   onTaskComplete() {
     let item = this.state.item
     item.complete = !item.complete
@@ -79,11 +88,31 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
     })
   }
 
+  async onMissionComplete() {
+    let item = this.state.item
+    if (this.state.item.category === 'mission') {
+      item = completeMission(this.state.item, this.state.missionCompleteValue)
+      const newTask = renewMission(item)
+      if (newTask) {
+        await fetchTask('/api/addTask', newTask)
+      }
+    } else if (this.state.item.category === 'task') {
+      item = completeTask(this.state.item, this.state.taskCompleteValue)
+      const newTask = renewTask(item)
+      if (newTask) {
+        await fetchTask('/api/addTask', newTask)
+      }
+    }
+    await fetchTask('/api/addTask', item)
+    this.setState({ item: item, popVisible: false })
+  }
+
   onTaskEdit() {
     this.setState({ modalVisible: true })
   }
 
   onMissionCompleteValue(value: number) {
+    console.log(value)
     value = Math.floor(value)
     this.setState({ missionCompleteValue: value })
   }
@@ -108,6 +137,10 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
     this.setState({ modalVisible: false })
   }
 
+  handlePopVisible(visible: boolean) {
+    this.setState({ popVisible: visible })
+  }
+
   render() {
     let completeButton
     if (this.state.item.complete || this.state.item.category === 'remind') {
@@ -130,12 +163,20 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
               onChange={this.onMissionCompleteValue}
             />
             <Typography.Text>分钟</Typography.Text>
-            <Button type={'primary'}>提交</Button>
+            <Button type={'primary'} onClick={this.onMissionComplete}>
+              提交
+            </Button>
           </Space>
         </>
       )
       completeButton = (
-        <Popover content={popContent} title={'完成任务'} trigger={'click'}>
+        <Popover
+          content={popContent}
+          title={'完成任务'}
+          trigger={'click'}
+          visible={this.state.popVisible}
+          onVisibleChange={this.handlePopVisible}
+        >
           <PpaIconButton key={'complete'} icon={<CheckCircleOutlined />} />
         </Popover>
       )
@@ -151,12 +192,20 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
               onChange={this.onTaskCompleteValue}
             />
             <Typography.Text>次</Typography.Text>
-            <Button type={'primary'}>提交</Button>
+            <Button type={'primary'} onClick={this.onMissionComplete}>
+              提交
+            </Button>
           </Space>
         </>
       )
       completeButton = (
-        <Popover content={popContent} title={'完成任务'} trigger={'click'}>
+        <Popover
+          content={popContent}
+          title={'完成任务'}
+          trigger={'click'}
+          visible={this.state.popVisible}
+          onVisibleChange={this.handlePopVisible}
+        >
           <PpaIconButton key={'complete'} icon={<CheckCircleOutlined />} />
         </Popover>
       )
