@@ -114,6 +114,8 @@ export function completeMission(item:PpaTransaction,value:number):PpaTransaction
     item.volume.complete.add(value,'m')
     if(item.volume.total&&(item.volume.complete.asMinutes()>=item.volume.total.asMinutes())){
       item.complete=true
+    }else if(item.volume.period&&moment().isBefore(item.beginTime.add(item.volume.period))){
+      item.complete=true
     }
   }
   return item
@@ -122,7 +124,9 @@ export function completeMission(item:PpaTransaction,value:number):PpaTransaction
 export function completeTask(item:PpaTransaction,value:number):PpaTransaction{
   if(item.stats){
     item.stats.complete+=value
-    if(item.stats.total&&item.stats.complete>=item.stats.total){
+    if(item.stats.total&&(item.stats.complete>=item.stats.total)){
+      item.complete=true
+    }else if(item.stats.period && moment().isBefore(item.beginTime.add(item.stats.period))){
       item.complete=true
     }
   }
@@ -130,7 +134,8 @@ export function completeTask(item:PpaTransaction,value:number):PpaTransaction{
 }
 
 export function renewMission(item:PpaTransaction):PpaTransaction|null{
-  let mission=item
+  let obj={}
+  let mission=Object.assign(obj,item)
   if(mission.complete&&mission.volume&&mission.volume.period){
     mission.key=v1()
     mission.complete=false
@@ -142,7 +147,8 @@ export function renewMission(item:PpaTransaction):PpaTransaction|null{
 }
 
 export function renewTask(item:PpaTransaction):PpaTransaction|null{
-  let task=item
+  let obj={}
+  let task=Object.assign(obj,item)
   if(task.complete&&task.stats&&task.stats.period){
     task.key=v1()
     task.complete=false

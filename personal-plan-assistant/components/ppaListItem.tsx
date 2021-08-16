@@ -95,12 +95,14 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
       const newTask = renewMission(item)
       if (newTask) {
         await fetchTask('/api/addTask', newTask)
+        await mutate('/api/getTasks')
       }
     } else if (this.state.item.category === 'task') {
       item = completeTask(this.state.item, this.state.taskCompleteValue)
       const newTask = renewTask(item)
       if (newTask) {
         await fetchTask('/api/addTask', newTask)
+        await mutate('/api/getTasks')
       }
     }
     await fetchTask('/api/addTask', item)
