@@ -77,15 +77,16 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
     this.handlePopVisible = this.handlePopVisible.bind(this)
   }
 
-  onTaskComplete() {
+  async onTaskComplete() {
     let item = this.state.item
     item.complete = !item.complete
     this.setState({
       item: item
     })
-    fetchTask('/api/completeTask', item).catch(error => {
+    await fetchTask('/api/completeTask', item).catch(error => {
       console.log(error)
     })
+    await mutate('/api/getTasks')
   }
 
   async onMissionComplete() {
@@ -95,17 +96,16 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
       const newTask = renewMission(item)
       if (newTask) {
         await fetchTask('/api/addTask', newTask)
-        await mutate('/api/getTasks')
       }
     } else if (this.state.item.category === 'task') {
       item = completeTask(this.state.item, this.state.taskCompleteValue)
       const newTask = renewTask(item)
       if (newTask) {
         await fetchTask('/api/addTask', newTask)
-        await mutate('/api/getTasks')
       }
     }
     await fetchTask('/api/addTask', item)
+    await mutate('/api/getTasks')
     this.setState({ item: item, popVisible: false })
   }
 

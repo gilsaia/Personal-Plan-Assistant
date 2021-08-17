@@ -68,6 +68,19 @@ export function getPpaTransactionTitle(item: PpaTransaction): JSX.Element {
   }
 }
 
+export function getPpaTransactionCmpTime(item:PpaTransaction):Moment{
+  if(item.category==='remind'&&item.endTime){
+    return item.endTime
+  }
+  if(item.category==='mission'&&item.volume&&item.volume.period){
+    return item.beginTime.add(item.volume.period)
+  }
+  if(item.category==='task'&&item.stats&&item.stats.period){
+    return item.beginTime.add(item.stats.period)
+  }
+  return item.beginTime
+}
+
 export function constructRemind(title:string,enableTime:boolean,endTime?:Moment):PpaTransaction{
   return {
     key:v1(),

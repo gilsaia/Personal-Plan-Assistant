@@ -1,4 +1,4 @@
-import { Button, Layout, List, PageHeader, Space } from 'antd'
+import { Button, Collapse, Layout, List, PageHeader, Space } from 'antd'
 import { PpaSider } from '../components/ppaSider'
 import { PpaListItem } from '../components/ppaListItem'
 import { PpaTransaction, syncData } from '../lib/ppaTransaction'
@@ -10,6 +10,8 @@ import { Session } from 'next-auth'
 import { getSession, useSession } from 'next-auth/client'
 import { PpaButtonModal } from '../components/ppaButtonModal'
 import { PpaTaskModal } from '../components/ppaTaskModal'
+import { Panel } from 'rc-collapse'
+import { divideTransaction } from '../lib/sort'
 const { Header, Footer, Sider, Content } = Layout
 
 const fetchTask = (url: RequestInfo, name?: string) =>
@@ -24,6 +26,26 @@ const fetchTask = (url: RequestInfo, name?: string) =>
 export default function Task() {
   let { data, error } = useSWR<PpaTransaction[]>('/api/getTasks', fetcher)
   data = data?.map(item => syncData(item))
+  let divideData = divideTransaction(data)
+  let collapse = (
+    <Collapse ghost defaultActiveKey={divideData[0].key}>
+      {divideData.map(rule => {
+        return (
+          <Panel header={rule.title} key={rule.key}>
+            <List
+              size={'default'}
+              bordered={true}
+              split={true}
+              dataSource={rule.itemList}
+              renderItem={item => (
+                <PpaListItem key={item.key} transaction={item} />
+              )}
+            />
+          </Panel>
+        )
+      })}
+    </Collapse>
+  )
 
   return (
     <Layout>
@@ -35,18 +57,15 @@ export default function Task() {
         <Content>
           <div style={{ backgroundColor: '#fff' }}>
             <Space>
-              <PpaButtonModal buttonText={'新建任务'} buttonStyle={{marginLeft:24}}/>
+              <PpaButtonModal
+                buttonText={'新建任务'}
+                buttonStyle={{ marginLeft: 24 }}
+              />
               {/*<Button type={'primary'} style={{marginLeft:24}}>新建任务</Button>*/}
             </Space>
           </div>
           <div style={{ padding: 24, minHeight: 360, backgroundColor: '#fff' }}>
-            <List
-              size={'default'}
-              bordered={true}
-              split={true}
-              dataSource={data}
-              renderItem={item => <PpaListItem key={item.key} transaction={item} />}
-            />
+            {collapse}
           </div>
         </Content>
       </Layout>
