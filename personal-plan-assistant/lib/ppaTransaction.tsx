@@ -258,15 +258,46 @@ function translateDuration(duration: moment.Duration): string {
   return res
 }
 
+function getTimelineText(item:PpaTransaction):string{
+  if(moment().isBefore(item.beginTime)){
+    return item.beginTime.fromNow(true)+'后开始'
+  }
+  if(item.category==='remind'&&item.endTime){
+    if (moment().isBefore(item.endTime)) {
+      return  item.endTime.fromNow() + '过期'
+    } else {
+      return  '已于' + item.endTime.fromNow() + '截止'
+    }
+  }
+  if(item.category==='mission'&&item.volume&&item.volume.period){
+    const endTime=item.beginTime.add(item.volume.period)
+    if(moment().isBefore(endTime)){
+      return endTime.fromNow()+'过期'
+    }else{
+      return '已于'+endTime.fromNow()+'截止'
+    }
+  }
+  if(item.category==='task'&&item.stats&&item.stats.period){
+    const endTime=item.beginTime.add(item.stats.period)
+    if(moment().isBefore(endTime)){
+      return endTime.fromNow()+'过期'
+    }else{
+      return '已于'+endTime.fromNow()+'截止'
+    }
+  }
+  return '开始于'+item.beginTime.fromNow()
+}
+
 export function getPpaTransactionShow(item: PpaTransaction): JSX.Element {
   let text = ''
+  let timelineText=getTimelineText(item)
   if (item.complete) {
     return <Typography.Text type={'secondary'}>{text}</Typography.Text>
   }
   switch (item.category) {
     case 'mission':
       if (item.volume) {
-        text = '完成量' + translateDuration(item.volume.complete)
+        text = '完成量' + translateDuration(item.volume.complete)+' '+timelineText
         let progress = -1
         if (item.volume.total) {
           const progress =
@@ -288,17 +319,11 @@ export function getPpaTransactionShow(item: PpaTransaction): JSX.Element {
       }
       return <Typography.Text type={'secondary'}>{text}</Typography.Text>
     case 'remind':
-      if (item.endTime) {
-        if (moment().isBefore(item.endTime)) {
-          text = item.endTime.fromNow() + '过期'
-        } else {
-          text = '已于' + item.endTime.fromNow() + '截止'
-        }
-      }
+      text=timelineText
       return <Typography.Text type={'secondary'}>{text}</Typography.Text>
     case 'task':
       if (item.stats) {
-        text = '完成' + item.stats.complete + '次'
+        text = '完成' + item.stats.complete + '次'+' '+timelineText
         if (item.stats.total) {
           const progress = (item.stats.complete / item.stats.total) * 100
           return (
