@@ -25,8 +25,8 @@ const fetchTask = (url: RequestInfo, name?: string) =>
 
 export default function Task() {
   let { data, error } = useSWR<PpaTransaction[]>('/api/getTasks', fetcher)
-  data = data?.map(item => syncData(item))
-  let divideData = divideTransaction(data)
+  const transactionData = data?.map(item => syncData(item))
+  let divideData = divideTransaction(transactionData)
   let collapse = (
     <Collapse ghost defaultActiveKey={divideData[0].key}>
       {divideData.map(rule => {

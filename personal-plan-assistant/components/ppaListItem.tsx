@@ -33,6 +33,7 @@ import {
 } from '../lib/ppaTransaction'
 import { mutate } from 'swr'
 import { PpaTaskModal } from './ppaTaskModal'
+import moment from 'moment'
 
 interface ItemProps {
   transaction: PpaTransaction
@@ -114,7 +115,6 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
   }
 
   onMissionCompleteValue(value: number) {
-    console.log(value)
     value = Math.floor(value)
     this.setState({ missionCompleteValue: value })
   }

@@ -72,13 +72,14 @@ export function getPpaTransactionCmpTime(item:PpaTransaction):Moment{
   if(item.category==='remind'&&item.endTime){
     return item.endTime
   }
+  const beginTime=moment(item.beginTime)
   if(item.category==='mission'&&item.volume&&item.volume.period){
-    return item.beginTime.add(item.volume.period)
+    return beginTime.add(item.volume.period)
   }
   if(item.category==='task'&&item.stats&&item.stats.period){
-    return item.beginTime.add(item.stats.period)
+    return beginTime.add(item.stats.period)
   }
-  return item.beginTime
+  return beginTime
 }
 
 export function constructRemind(title:string,enableTime:boolean,endTime?:Moment):PpaTransaction{
@@ -125,9 +126,12 @@ export function constructTask(title:string,beginTime:Moment,unlimited?:boolean,v
 export function completeMission(item:PpaTransaction,value:number):PpaTransaction{
   if(item.volume){
     item.volume.complete.add(value,'m')
-    if(item.volume.total&&(item.volume.complete.asMinutes()>=item.volume.total.asMinutes())){
-      item.complete=true
-    }else if(item.volume.period&&moment().isBefore(item.beginTime.add(item.volume.period))){
+    const beginTime=moment(item.beginTime)
+    if(item.volume.total){
+      if(item.volume.complete.asMinutes()>=item.volume.total.asMinutes()){
+        item.complete=true
+      }
+    }else if(item.volume.period&&moment().isAfter(beginTime.add(item.volume.period))){
       item.complete=true
     }
   }
@@ -137,9 +141,12 @@ export function completeMission(item:PpaTransaction,value:number):PpaTransaction
 export function completeTask(item:PpaTransaction,value:number):PpaTransaction{
   if(item.stats){
     item.stats.complete+=value
-    if(item.stats.total&&(item.stats.complete>=item.stats.total)){
-      item.complete=true
-    }else if(item.stats.period && moment().isBefore(item.beginTime.add(item.stats.period))){
+    const beginTime=moment(item.beginTime)
+    if(item.stats.total){
+      if(item.stats.complete>=item.stats.total){
+        item.complete=true
+      }
+    }else if(item.stats.period && moment().isAfter(beginTime.add(item.stats.period))){
       item.complete=true
     }
   }
@@ -269,8 +276,9 @@ function getTimelineText(item:PpaTransaction):string{
       return  '已于' + item.endTime.fromNow() + '截止'
     }
   }
+  const beginTime=moment(item.beginTime)
   if(item.category==='mission'&&item.volume&&item.volume.period){
-    const endTime=item.beginTime.add(item.volume.period)
+    const endTime=beginTime.add(item.volume.period)
     if(moment().isBefore(endTime)){
       return endTime.fromNow()+'过期'
     }else{
@@ -278,7 +286,7 @@ function getTimelineText(item:PpaTransaction):string{
     }
   }
   if(item.category==='task'&&item.stats&&item.stats.period){
-    const endTime=item.beginTime.add(item.stats.period)
+    const endTime=beginTime.add(item.stats.period)
     if(moment().isBefore(endTime)){
       return endTime.fromNow()+'过期'
     }else{
