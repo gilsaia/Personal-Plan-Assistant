@@ -105,7 +105,7 @@ export class PpaListItem extends React.Component<ItemProps, ItemState> {
         await fetchTask('/api/addTask', newTask)
       }
     }
-    await fetchTask('/api/addTask', item)
+    await fetchTask('/api/completeTask', item)
     await mutate('/api/getTasks')
     this.setState({ item: item, popVisible: false })
   }
